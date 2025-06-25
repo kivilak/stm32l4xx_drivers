@@ -1,0 +1,2 @@
+../Drivers/Src/stm32l476xx_gpio_driver.c:26:6:GPIO_PeriClockControl	16	static
+../Drivers/Src/stm32l476xx_gpio_driver.c:82:6:GPIO_Init	16	static
