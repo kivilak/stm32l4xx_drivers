@@ -1,2 +1,8 @@
 ../Drivers/Src/stm32l476xx_gpio_driver.c:26:6:GPIO_PeriClockControl	18
 ../Drivers/Src/stm32l476xx_gpio_driver.c:82:6:GPIO_Init	3
+../Drivers/Src/stm32l476xx_gpio_driver.c:129:6:GPIO_DeInit	9
+../Drivers/Src/stm32l476xx_gpio_driver.c:165:9:GPIO_ReadFromInputPin	1
+../Drivers/Src/stm32l476xx_gpio_driver.c:183:10:GPIO_ReadFromInputPort	1
+../Drivers/Src/stm32l476xx_gpio_driver.c:201:6:GPIO_WriteToOutputPin	2
+../Drivers/Src/stm32l476xx_gpio_driver.c:223:6:GPIO_WriteToOutputPort	1
+../Drivers/Src/stm32l476xx_gpio_driver.c:239:6:GPIO_ToggleOutputPin	1
