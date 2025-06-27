@@ -85,7 +85,7 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle) {
 	//1. configure the mode
 	if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_ANALOG) {
 		temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber)); // each pin have 2bit there for 2bit shifting needed
-		pGPIOHandle->pGPIOx->MODER &= ~( 0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);		//clearing
+		pGPIOHandle->pGPIOx->MODER &= ~( 0x3 << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));		//clearing
 		pGPIOHandle->pGPIOx->MODER |= temp;		//setting
 	} else {
 		// interrupt mode
@@ -237,7 +237,7 @@ void GPIO_WriteToOutputPort(GPIO_RegDef_t *pGPIOx, uint16_t Value) {
  * @Note			- none
  */
 void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber) {
-	pGPIOx ^= (1 << PinNumber);
+	pGPIOx->ODR ^= (1 << PinNumber);
 }
 
 /*
