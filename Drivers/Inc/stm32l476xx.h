@@ -73,8 +73,8 @@ typedef struct {
 	__vo uint32_t ODR;			// GPIO port output data register
 	__vo uint32_t BSRR;			// GPIO port bit set/reset register
 	__vo uint32_t LCKR;			// GPIO port configuration lock register
-	__vo uint32_t AFRL;			// GPIO alternate function low register
-	__vo uint32_t AFRH;			// GPIO alternate function high register
+	__vo uint32_t AFR[2];			// GPIO alternate function low register
+	//__vo uint32_t AFRH;			// GPIO alternate function high register
 	__vo uint32_t BRR;			// GPIO port bit reset register
 	__vo uint32_t ASCR;			// GPIO port analog switch control register
 } GPIO_RegDef_t;
@@ -214,6 +214,19 @@ typedef struct {
 /*	Clock disable Macros for SYSCFG peripherals	*/
 
 #define SYSCFG_PCLK_DI() 	(RCC->APB2ENR &= ~(1 << 0))
+
+/*
+ *  Macros to reset GPIOx peripherals
+ */
+#define GPIOA_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 0)); (RCC->AHB2RSTR &= ~(1 << 0)); } while(0)
+#define GPIOB_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 1)); (RCC->AHB2RSTR &= ~(1 << 1)); } while(0)
+#define GPIOC_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 2)); (RCC->AHB2RSTR &= ~(1 << 2)); } while(0)
+#define GPIOD_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 3)); (RCC->AHB2RSTR &= ~(1 << 3)); } while(0)
+#define GPIOE_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 4)); (RCC->AHB2RSTR &= ~(1 << 4)); } while(0)
+#define GPIOF_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 5)); (RCC->AHB2RSTR &= ~(1 << 5)); } while(0)
+#define GPIOG_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 6)); (RCC->AHB2RSTR &= ~(1 << 6)); } while(0)
+#define GPIOH_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 7)); (RCC->AHB2RSTR &= ~(1 << 7)); } while(0)
+
 
 //some generic macros
 
