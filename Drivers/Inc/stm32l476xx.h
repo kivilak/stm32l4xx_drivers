@@ -11,6 +11,34 @@
 
 #define __vo volatile
 
+/********************************** Processor Specific Details *************************************/
+
+/*
+ * ARM Cortex Mx processor NVIC ISERx register addresses
+ */
+#define NVIC_ISER0		((__vo uint32_t*) 0xE000E100)
+#define NVIC_ISER1		((__vo uint32_t*) 0xE000E104)
+#define NVIC_ISER2		((__vo uint32_t*) 0xE000E108)
+#define NVIC_ISER3		((__vo uint32_t*) 0xE000E10c)
+
+/*
+ * ARM Cortex Mx processor NVIC ISERx register addresses
+ */
+#define NVIC_ICER0		((__vo uint32_t*) 0XE000E180)
+#define NVIC_ICER1		((__vo uint32_t*) 0XE000E184)
+#define NVIC_ICER2		((__vo uint32_t*) 0XE000E188)
+#define NVIC_ICER3		((__vo uint32_t*) 0XE000E18c)
+
+/*
+ * ARM cortex Mx Processor priority register address calculation
+ */
+#define NVIC_PR_BASE_ADDR	((__vo uint32_t*) 0xE000E400)
+
+/*
+ * ARM cortex Mx processor number of priority bits implemented in priority register
+ */
+#define NO_PR_BITS_IMPLEMENTED	4
+
 /*	base addresses of Flash and SRAM memories	*/
 
 #define FLASH_BASEADDR 	0x08000000U 	//	base address of flash memory
@@ -79,6 +107,9 @@ typedef struct {
 	__vo uint32_t ASCR;			// GPIO port analog switch control register
 } GPIO_RegDef_t;
 
+/*
+ * peripheral register definition structure for RCC
+ */
 typedef struct {
 	__vo uint32_t CR;			// Clock control register
 	__vo uint32_t ICSCR;		// Internal clock sources calibration register
@@ -122,6 +153,32 @@ typedef struct {
 	__vo uint32_t CCIPR2;		// Peripherals independent clock configuration register
 } RCC_RegDef_t;
 
+/*
+ * peripheral register definition structure for EXTI
+ */
+typedef struct {
+	__vo uint32_t IMR;			// Interrupt mask register
+	__vo uint32_t EMR;			// Event mask register
+	__vo uint32_t RTSR;			// Rising Trigger section register
+	__vo uint32_t FTSR;			// Falling trigger section register
+	__vo uint32_t SWIER;		// Software interrupt event register
+	__vo uint32_t PR;			// Pending register
+} EXTI_RegDef_t;
+
+/*
+ * peripheral register definition structure for SYSCFG
+ */
+typedef struct {
+	__vo uint32_t MEMRMP;		// Memory remap register
+	__vo uint32_t CFGR1;		// Configuration register 1
+	__vo uint32_t EXTICR[4];	// External interrupt configuration registers
+	__vo uint32_t SCSR; 		// SRAM2 control & status register
+	__vo uint32_t CFGR2; 		// Configuration register 2
+	__vo uint32_t SWPR; 		// SRAM2 write protection register
+	__vo uint32_t SKR;			// SRAM2 key register
+	__vo uint32_t SWPR2;		// SRAM2 write protection register 2
+} SYSCFG_RegDef_t;
+
 /************************************************************************/
 /*	peripheral definitions (peripheral base address typecasted to xxx_RegDef_t)	*/
 
@@ -135,6 +192,10 @@ typedef struct {
 #define GPIOH 		((GPIO_RegDef_t*) GPIOH_BASEADDR)
 
 #define RCC			((RCC_RegDef_t*) RCC_BASEADDR)
+
+#define EXTI		((EXTI_RegDef_t*) EXTI_BASEADDR)
+
+#define SYSCFG		((SYSCFG_RegDef_t*) SYSCFG_BASEADDR)
 
 /************************************************************************/
 /*	Clock enable Macros for GPIOx peripherals	*/
@@ -227,6 +288,26 @@ typedef struct {
 #define GPIOG_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 6)); (RCC->AHB2RSTR &= ~(1 << 6)); } while(0)
 #define GPIOH_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 7)); (RCC->AHB2RSTR &= ~(1 << 7)); } while(0)
 
+#define GPIO_BASEADDR_TO_CODE(x) (	(x == GPIOA) ? 0 :\
+								 	(x == GPIOB) ? 1 :\
+								 	(x == GPIOC) ? 2 :\
+								 	(x == GPIOD) ? 3 :\
+								 	(x == GPIOE) ? 4 :\
+								 	(x == GPIOF) ? 5 :\
+								 	(x == GPIOG) ? 6 :\
+								 	(x == GPIOH) ? 7 : 0)
+
+/*
+ * IRQ(Interrupt request) numbers of STM32L476 MCU
+ */
+
+#define IRQ_NO_EXTI0		6
+#define IRQ_NO_EXTI1		7
+#define IRQ_NO_EXTI2		8
+#define IRQ_NO_EXTI3		9
+#define IRQ_NO_EXTI4		10
+#define IRQ_NO_EXTI9_5		23
+#define IRQ_NO_EXTI15_10	40
 
 //some generic macros
 
