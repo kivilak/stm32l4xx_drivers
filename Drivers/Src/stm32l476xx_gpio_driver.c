@@ -88,6 +88,9 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle) {
 		pGPIOHandle->pGPIOx->MODER &= ~( 0x3 << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));		//clearing
 		pGPIOHandle->pGPIOx->MODER |= temp;		//setting
 	} else {
+		//to be sure that this pin is configure as an input
+		pGPIOHandle->pGPIOx->MODER &= ~(0x3 <<(2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
+
 		// interrupt mode
 		if(pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <=  GPIO_MODE_IT_FT) {
 			//configure falling trigger register
@@ -331,7 +334,7 @@ void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t ENorDI) {
  *
  * @Note			- none
  */
-void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint8_t IRQPriority) {
+void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority) {
 	//ipr register
 	uint8_t iprx = IRQNumber / 4;
 	uint8_t iprx_section = IRQNumber % 4;
