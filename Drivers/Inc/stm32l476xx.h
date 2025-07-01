@@ -179,6 +179,20 @@ typedef struct {
 	__vo uint32_t SWPR2;		// SRAM2 write protection register 2
 } SYSCFG_RegDef_t;
 
+/*
+ * peripheral register definition structure for SPI
+ */
+
+typedef struct {
+	__vo uint32_t CR1;			//SPI control register 1
+	__vo uint32_t CR2;			//SPI control register 2
+	__vo uint32_t SR;			//SPI status register
+	__vo uint32_t DR;			//SPI data register
+	__vo uint32_t CRCPR;		//SPI CRC polynomial register
+	__vo uint32_t RXCRCR;		//SPI Rx CRC register
+	__vo uint32_t TXCRCR;		//SPI Tx CRC register
+} SPI_RegDef_t;
+
 /************************************************************************/
 /*	peripheral definitions (peripheral base address typecasted to xxx_RegDef_t)	*/
 
@@ -196,6 +210,10 @@ typedef struct {
 #define EXTI		((EXTI_RegDef_t*) EXTI_BASEADDR)
 
 #define SYSCFG		((SYSCFG_RegDef_t*) SYSCFG_BASEADDR)
+
+#define SPI1 		((SPI_RegDef_t*) SPI1_BASEADDR)
+#define SPI2		((SPI_RegDef_t*) SPI2_BASEADDR)
+#define SPI3		((SPI_RegDef_t*) SPI3_BASEADDR)
 
 /************************************************************************/
 /*	Clock enable Macros for GPIOx peripherals	*/
