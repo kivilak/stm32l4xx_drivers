@@ -1,0 +1,2 @@
+../Drivers/Src/stm32l476xx_spi_driver.c:26:6:SPI_PeriClockControl	8
+../Drivers/Src/stm32l476xx_spi_driver.c:59:6:SPI_Init	4
