@@ -4,7 +4,7 @@
  *  Created on: Jun 25, 2025
  *      Author: Kivilak Chathuranga
  */
-#include "stm32l476xx.h"
+
 #include "stm32l476xx_gpio_driver.h"
 
 /*
