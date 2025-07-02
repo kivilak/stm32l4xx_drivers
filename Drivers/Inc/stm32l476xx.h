@@ -306,6 +306,14 @@ typedef struct {
 #define GPIOG_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 6)); (RCC->AHB2RSTR &= ~(1 << 6)); } while(0)
 #define GPIOH_REG_RESET() 	do{ (RCC->AHB2RSTR |= (1 << 7)); (RCC->AHB2RSTR &= ~(1 << 7)); } while(0)
 
+/*
+ *  Macros to reset SPIx peripherals
+ */
+#define SPI1_REG_RESET() 	do{ (RCC->APB2RSTR |= (1 << 12)); (RCC->APB2RSTR &= ~(1 << 12)); } while(0)
+#define SPI2_REG_RESET() 	do{ (RCC->APB1RSTR1 |= (1 << 14)); (RCC->APB1RSTR1 &= ~(1 << 14)); } while(0)
+#define SPI3_REG_RESET() 	do{ (RCC->APB1RSTR1 |= (1 << 15)); (RCC->APB1RSTR1 &= ~(1 << 15)); } while(0)
+
+
 #define GPIO_BASEADDR_TO_CODE(x) (	(x == GPIOA) ? 0 :\
 								 	(x == GPIOB) ? 1 :\
 								 	(x == GPIOC) ? 2 :\
@@ -341,10 +349,16 @@ typedef struct {
 #define RESET 				DISABLE
 #define GPIO_PIN_SET		SET
 #define GPIO_PIN_RESET		RESET
+#define FLAG_RESET			RESET
+#define FLAG_SET			SET
 
 /***************************************************************************************************
  * Bit position definitions of SPI peripheral
  ***************************************************************************************************/
+
+/*
+ * Bit position definitions SPI_CR1
+ */
 #define SPI_CR1_CPHA		0
 #define SPI_CR1_CPOL		1
 #define SPI_CR1_MSTR		2
@@ -359,6 +373,36 @@ typedef struct {
 #define SPI_CR1_CRCEN		13
 #define SPI_CR1_BIDIOE		14
 #define SPI_CR1_BIDIMODE	15
+
+/*
+ * Bit position definitions SPI_CR2
+ */
+#define SPI_CR2_RXDMAEN		0
+#define SPI_CR2_TXDMAEN		1
+#define SPI_CR2_SSOE		2
+#define SPI_CR2_NSSP		3
+#define SPI_CR2_FRF			4
+#define SPI_CR2_ERRIE		5
+#define SPI_CR2_RXNEIE		6
+#define SPI_CR2_TXEIE		7
+#define SPI_CR2_DS			8
+#define SPI_CR2_FRXTH		12
+#define SPI_CR2_LDMA_RX		13
+#define SPI_CR2_LDMA_TX		14
+
+/*
+ * Bit position definitions SPI_SR
+ */
+#define SPI_SR_RXNE			0
+#define SPI_SR_TXE			1
+#define SPI_SR_CRCERR		4
+#define SPI_SR_MODF			5
+#define SPI_SR_OVR			6
+#define SPI_SR_BSY			7
+#define SPI_SR_FRE			8
+#define SPI_SR_FRLVL		9
+#define SPI_SR_FTLVL		11
+
 
 #include "stm32l476xx_gpio_driver.h"
 #include "stm32l476xx_spi_driver.h"

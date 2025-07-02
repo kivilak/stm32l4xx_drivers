@@ -91,3 +91,79 @@ void SPI_Init(SPI_Handle_t *pSPIHandle) {
 
 	pSPIHandle->pSPIx->CR1 = tempreg;
 }
+
+/*************************************************************************
+ * @fn				- SPI_DeInit
+ *
+ * @brief			-
+ *
+ * @param[in]		- SPI_RegDef_t - SPI register definition structure
+ *
+ * @retrun			- none
+ *
+ * @Note			- none
+ */
+void SPI_DeInit(SPI_RegDef_t *pSPIx) {
+	if(pSPIx == SPI1) {
+		SPI1_REG_RESET();
+	} else if(pSPIx == SPI2) {
+		SPI2_REG_RESET();
+	} else if(pSPIx == SPI3) {
+		SPI3_REG_RESET();
+	}
+}
+
+/*************************************************************************
+ * @fn				- SPI_GetFlagStatus
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ *
+ * @retrun			- none
+ *
+ * @Note			- none
+ */
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName) {
+	if(pSPIx->SR & FlagName) {
+		return FLAG_SET;
+	}
+	return FLAG_RESET;
+}
+
+/*************************************************************************
+ * @fn				- SPI_SendData
+ *
+ * @brief			-
+ *
+ * @param[in]		-
+ * @param[in]		-
+ *
+ * @retrun			- none
+ *
+ * @Note			- This is a blocking call
+ */
+void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len) {
+	while(len > 0) {
+		//1. wait until TXE is set
+		while(SPI_GetFlagStatus(pSPIx, SPI_TXE_FLAG) == FLAG_RESET);
+
+		//2. check the DFF(CRCL) bit in CR1
+		if(pSPIx->SR & (1 << SPI_CR1_CRCL)) {
+			//16 bit DFF
+			//1. load data into the DR(data register)
+			pSPIx->DR = *((uint16_t*) pTxBuffer);
+			len--;
+			len--;
+			//2. point to next data item
+			(uint16_t*) pTxBuffer++;
+		} else {
+			//8 bit DFF
+			pSPIx->DR = *(pTxBuffer);
+			len--;
+			pTxBuffer++;
+		}
+	}
+}
+
