@@ -49,7 +49,7 @@ typedef struct {
 /*
  * @SPI_SclkSpeed
  */
-#define SPI_SCLK_SPEDD_DIV2			0
+#define SPI_SCLK_SPEED_DIV2			0
 #define SPI_SCLK_SPEED_DIV4			1
 #define SPI_SCLK_SPEED_DIV8			2
 #define SPI_SCLK_SPEED_DIV16		3
@@ -121,5 +121,6 @@ void SPI_IRQHandling(SPI_Handle_t *pHandle);
 /*
  * Other peripheral control APIs
  */
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t ENorDI);
 
 #endif /* INC_STM32L476XX_SPI_DRIVER_H_ */

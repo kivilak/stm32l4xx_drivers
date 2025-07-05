@@ -57,6 +57,9 @@ void SPI_PeriClockControl(SPI_RegDef_t *pSPIx, uint8_t ENorDI) {
  * @Note			- none
  */
 void SPI_Init(SPI_Handle_t *pSPIHandle) {
+	//peripheral clock enable
+	SPI_PeriClockControl(pSPIHandle->pSPIx, ENABLE);
+
 	//configure the SPI_CR1 register
 	uint32_t tempreg = 0;
 
@@ -167,3 +170,10 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len) {
 	}
 }
 
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t ENorDI) {
+	if(ENorDI == ENABLE) {
+		pSPIx->CR1 |= (1 << SPI_CR1_SPE);
+	} else {
+		pSPIx->CR1 &= ~(1 << SPI_CR1_SPE);
+	}
+}
