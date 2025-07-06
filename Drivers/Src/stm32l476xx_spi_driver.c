@@ -84,13 +84,17 @@ void SPI_Init(SPI_Handle_t *pSPIHandle) {
 	tempreg |= pSPIHandle->SPIConfig.SPI_SclkSpeed << SPI_CR1_BR;
 
 	//4. configure the DFF(CRCL)
-	tempreg |= pSPIHandle->SPIConfig.SPI_CRCL << SPI_CR1_CRCL;
+	tempreg |= pSPIHandle->SPIConfig.SPI_DS << SPI_CR2_DS;
 
 	//5. configure the CPOL
 	tempreg |= pSPIHandle->SPIConfig.SPI_CPOL << SPI_CR1_CPOL;
 
 	//6. configure the CPHA
 	tempreg |= pSPIHandle->SPIConfig.SPI_CPHA << SPI_CR1_CPHA;
+
+	//7. configure the SSM
+	tempreg |= pSPIHandle->SPIConfig.SPI_SSM << SPI_CR1_SSM;
+
 
 	pSPIHandle->pSPIx->CR1 = tempreg;
 }
@@ -147,7 +151,22 @@ uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName) {
  *
  * @Note			- This is a blocking call
  */
-void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len) {
+
+void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len)
+{
+	while(Len > 0)
+	{
+		//1. wait until TXE is set
+		while(SPI_GetFlagStatus(pSPIx, SPI_TXE_FLAG)  == FLAG_RESET);
+
+		//8 bit DS
+		*((volatile uint8_t *)&pSPIx->DR) = *pTxBuffer;
+		Len--;
+		pTxBuffer++;
+	}
+}
+
+/*void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len) {
 	while(len > 0) {
 		//1. wait until TXE is set
 		while(SPI_GetFlagStatus(pSPIx, SPI_TXE_FLAG) == FLAG_RESET);
@@ -168,7 +187,7 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len) {
 			pTxBuffer++;
 		}
 	}
-}
+}*/
 
 void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t ENorDI) {
 	if(ENorDI == ENABLE) {
@@ -176,4 +195,12 @@ void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t ENorDI) {
 	} else {
 		pSPIx->CR1 &= ~(1 << SPI_CR1_SPE);
 	}
+}
+
+void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t ENorDI) {
+	if(ENorDI == ENABLE) {
+			pSPIx->CR1 |= (1 << SPI_CR1_SSI);
+		} else {
+			pSPIx->CR1 &= ~(1 << SPI_CR1_SSI);
+		}
 }

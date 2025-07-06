@@ -18,7 +18,7 @@ typedef struct {
 	uint8_t SPI_DeviceMode;
 	uint8_t SPI_BusConfig;
 	uint8_t SPI_SclkSpeed;
-	uint8_t SPI_CRCL;
+	uint8_t SPI_DS;
 	uint8_t SPI_CPOL;
 	uint8_t SPI_CPHA;
 	uint8_t SPI_SSM;
@@ -63,6 +63,10 @@ typedef struct {
  */
 #define SPI_DFF_8BITS			0
 #define SPI_DFF_16BITS			1
+
+#define SPI_DS_NUM_BITS    4        // DS field is 4 bits wide
+//#define SPI_CR2_DS         0        // DS bits start at position 0 in CR2
+#define SPI_DS_8BITS       7
 
 /*
  * @SPI_CPOL
@@ -122,5 +126,6 @@ void SPI_IRQHandling(SPI_Handle_t *pHandle);
  * Other peripheral control APIs
  */
 void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t ENorDI);
+void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t ENorDI);
 
 #endif /* INC_STM32L476XX_SPI_DRIVER_H_ */
