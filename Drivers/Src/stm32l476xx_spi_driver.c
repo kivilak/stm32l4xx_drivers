@@ -61,42 +61,45 @@ void SPI_Init(SPI_Handle_t *pSPIHandle) {
 	SPI_PeriClockControl(pSPIHandle->pSPIx, ENABLE);
 
 	//configure the SPI_CR1 register
-	uint32_t tempreg = 0;
+	uint32_t tempreg1 = 0;
 
 	//1. configure the device mode
-	tempreg |= pSPIHandle->SPIConfig.SPI_DeviceMode << SPI_CR1_MSTR;
+	tempreg1 |= pSPIHandle->SPIConfig.SPI_DeviceMode << SPI_CR1_MSTR;
 
 	//2. configure the bus config
 	if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_FD) {
 		//bidi mode should be cleared
-		tempreg &= ~(1 << SPI_CR1_BIDIMODE);
+		tempreg1 &= ~(1 << SPI_CR1_BIDIMODE);
 	} else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_HD) {
 		//bidi mode should be set
-		tempreg |= (1 << SPI_CR1_BIDIMODE);
+		tempreg1 |= (1 << SPI_CR1_BIDIMODE);
 	} else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_RXONLY) {
 		//bidi mode should be cleared
-		tempreg &= ~(1 << SPI_CR1_BIDIMODE);
+		tempreg1 &= ~(1 << SPI_CR1_BIDIMODE);
 		//RXONLY bit must be set
-		tempreg |= (1 << SPI_CR1_RXONLY);
+		tempreg1 |= (1 << SPI_CR1_RXONLY);
 	}
 
 	//3. configure the SPI serial clock speed (baud rate)
-	tempreg |= pSPIHandle->SPIConfig.SPI_SclkSpeed << SPI_CR1_BR;
+	tempreg1 |= pSPIHandle->SPIConfig.SPI_SclkSpeed << SPI_CR1_BR;
 
-	//4. configure the DFF(CRCL)
-	tempreg |= pSPIHandle->SPIConfig.SPI_DS << SPI_CR2_DS;
+	//4. configure the CPOL
+	tempreg1 |= pSPIHandle->SPIConfig.SPI_CPOL << SPI_CR1_CPOL;
 
-	//5. configure the CPOL
-	tempreg |= pSPIHandle->SPIConfig.SPI_CPOL << SPI_CR1_CPOL;
+	//5. configure the CPHA
+	tempreg1 |= pSPIHandle->SPIConfig.SPI_CPHA << SPI_CR1_CPHA;
 
-	//6. configure the CPHA
-	tempreg |= pSPIHandle->SPIConfig.SPI_CPHA << SPI_CR1_CPHA;
+	//6. configure the SSM
+	tempreg1 |= pSPIHandle->SPIConfig.SPI_SSM << SPI_CR1_SSM;
 
-	//7. configure the SSM
-	tempreg |= pSPIHandle->SPIConfig.SPI_SSM << SPI_CR1_SSM;
+	//configure the SPI_CR2 register
+	uint32_t tempreg2 = 0;
 
+	//1. configure the DS
+	tempreg2 |= pSPIHandle->SPIConfig.SPI_DS << SPI_CR2_DS;
 
-	pSPIHandle->pSPIx->CR1 = tempreg;
+	pSPIHandle->pSPIx->CR1 = tempreg1;
+	pSPIHandle->pSPIx->CR2 = tempreg2;
 }
 
 /*************************************************************************
@@ -152,18 +155,28 @@ uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName) {
  * @Note			- This is a blocking call
  */
 
-void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len)
+void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t length)
 {
-	while(Len > 0)
-	{
-		//1. wait until TXE is set
-		while(SPI_GetFlagStatus(pSPIx, SPI_TXE_FLAG)  == FLAG_RESET);
+    while(length > 0) // blocking
+    {
+        //1. wait until TXE is set
+        while(SPI_GetFlagStatus(pSPIx, SPI_TXE_FLAG) == FLAG_RESET);
 
-		//8 bit DS
-		*((volatile uint8_t *)&pSPIx->DR) = *pTxBuffer;
-		Len--;
-		pTxBuffer++;
-	}
+        //2. check the 4 DS (DFF) bits in CR2 and handle for correct size
+
+        if ((((1 << SPI_DS_NUM_BITS) - 1) & (pSPIx->CR2 >> SPI_CR2_DS)) <= SPI_DS_8BITS) {
+			 // 8-bit data
+			// pSPIx->DR = *pTxBuffer;
+			 *((volatile uint8_t *)&pSPIx->DR) = *pTxBuffer;
+			 length--; // decrement once because data is 8-bit wide
+			 pTxBuffer++;
+		 } else {
+			 // 16-bit data
+			 pSPIx->DR = *((uint16_t*)pTxBuffer); //typecast to 16-bits
+			 length -= 2; // decrement twice for 2x 8-bit data
+			 (uint16_t*)pTxBuffer++; //typecast to 16-bits
+		 }
+    }
 }
 
 /*void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t len) {
