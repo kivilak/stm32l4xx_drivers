@@ -81,7 +81,9 @@ int main(void)
 	SPI_PeripheralControl(SPI2,ENABLE);
 
 	//to send data
-	SPI_SendData(SPI2,(uint8_t*)user_data,strlen(user_data));
+	SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
+
+	while(SPI_GetFlagStatus(SPI2, SPI_BSY_FLAG));
 
 	while(1);
 
