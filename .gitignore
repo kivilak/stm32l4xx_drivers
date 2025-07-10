@@ -1,1 +1,8 @@
+/.settings
 /Debug
+/Startup
+.cproject
+.project
+stm32l4xx_drivers Debug.launch
+STM32L476RGTX_FLASH.ld
+STM32L476RGTX_RAM.ld
