@@ -63,7 +63,7 @@ typedef struct {
  */
 
 #define SPI_DS_NUM_BITS    4        // DS field is 4 bits wide
-//#define SPI_CR2_DS         0        // DS bits start at position 0 in CR2
+
 #define SPI_DS_8BITS       7
 #define SPI_DS_16BITS      15
 
