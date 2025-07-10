@@ -61,45 +61,45 @@ void SPI_Init(SPI_Handle_t *pSPIHandle) {
 	SPI_PeriClockControl(pSPIHandle->pSPIx, ENABLE);
 
 	//configure the SPI_CR1 register
-	uint32_t tempreg1 = 0;
+	uint32_t cr1_tempreg = 0;
 
 	//1. configure the device mode
-	tempreg1 |= pSPIHandle->SPIConfig.SPI_DeviceMode << SPI_CR1_MSTR;
+	cr1_tempreg |= pSPIHandle->SPIConfig.SPI_DeviceMode << SPI_CR1_MSTR;
 
 	//2. configure the bus config
 	if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_FD) {
 		//bidi mode should be cleared
-		tempreg1 &= ~(1 << SPI_CR1_BIDIMODE);
+		cr1_tempreg &= ~(1 << SPI_CR1_BIDIMODE);
 	} else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_HD) {
 		//bidi mode should be set
-		tempreg1 |= (1 << SPI_CR1_BIDIMODE);
+		cr1_tempreg |= (1 << SPI_CR1_BIDIMODE);
 	} else if(pSPIHandle->SPIConfig.SPI_BusConfig == SPI_BUS_CONFIG_SIMPLEX_RXONLY) {
 		//bidi mode should be cleared
-		tempreg1 &= ~(1 << SPI_CR1_BIDIMODE);
+		cr1_tempreg&= ~(1 << SPI_CR1_BIDIMODE);
 		//RXONLY bit must be set
-		tempreg1 |= (1 << SPI_CR1_RXONLY);
+		cr1_tempreg|= (1 << SPI_CR1_RXONLY);
 	}
 
 	//3. configure the SPI serial clock speed (baud rate)
-	tempreg1 |= pSPIHandle->SPIConfig.SPI_SclkSpeed << SPI_CR1_BR;
+	cr1_tempreg |= pSPIHandle->SPIConfig.SPI_SclkSpeed << SPI_CR1_BR;
 
 	//4. configure the CPOL
-	tempreg1 |= pSPIHandle->SPIConfig.SPI_CPOL << SPI_CR1_CPOL;
+	cr1_tempreg |= pSPIHandle->SPIConfig.SPI_CPOL << SPI_CR1_CPOL;
 
 	//5. configure the CPHA
-	tempreg1 |= pSPIHandle->SPIConfig.SPI_CPHA << SPI_CR1_CPHA;
+	cr1_tempreg |= pSPIHandle->SPIConfig.SPI_CPHA << SPI_CR1_CPHA;
 
 	//6. configure the SSM
-	tempreg1 |= pSPIHandle->SPIConfig.SPI_SSM << SPI_CR1_SSM;
+	cr1_tempreg |= pSPIHandle->SPIConfig.SPI_SSM << SPI_CR1_SSM;
 
 	//configure the SPI_CR2 register
-	uint32_t tempreg2 = 0;
+	uint32_t cr2_tempreg = 0;
 
 	//1. configure the DS
-	tempreg2 |= pSPIHandle->SPIConfig.SPI_DS << SPI_CR2_DS;
+	cr2_tempreg |= pSPIHandle->SPIConfig.SPI_DS << SPI_CR2_DS;
 
-	pSPIHandle->pSPIx->CR1 = tempreg1;
-	pSPIHandle->pSPIx->CR2 = tempreg2;
+	pSPIHandle->pSPIx->CR1 = cr1_tempreg;
+	pSPIHandle->pSPIx->CR2 = cr2_tempreg;
 }
 
 /*************************************************************************
