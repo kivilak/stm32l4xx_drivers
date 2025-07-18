@@ -75,7 +75,7 @@ int main(void)
 	SPI2_Inits();
 
 	//this makes NSS signal internally high and avoids MODF error
-	SPI_SSIConfig(SPI2,ENABLE);
+	SPI_SSIConfig(SPI2, ENABLE);
 
 	//enable the SPI2 peripheral
 	SPI_PeripheralControl(SPI2,ENABLE);
@@ -84,6 +84,7 @@ int main(void)
 	SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
 
 	while(SPI_GetFlagStatus(SPI2, SPI_BSY_FLAG));
+	SPI_PeripheralControl(SPI2, DISABLE);
 
 	while(1);
 
