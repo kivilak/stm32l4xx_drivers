@@ -175,7 +175,7 @@ void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t length)
 			 // 16-bit data
 			 pSPIx->DR = *((uint16_t*)pTxBuffer); //typecast to 16-bits
 			 length -= 2; // decrement twice for 2x 8-bit data
-			 (uint16_t*)pTxBuffer++; //typecast to 16-bits
+			 pTxBuffer += 2;
 		 }
     }
 }
@@ -226,18 +226,18 @@ void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t length)
 
 		//2. check the 4 DS (DFF) bits in CR2 and handle for correct size
 
-		if ((((1 << SPI_DS_NUM_BITS) - 1) & (pSPIx->CR2 >> SPI_CR2_DS)) <= SPI_DS_8BITS) {
+		if (((pSPIx->CR2 >> SPI_CR2_DS) & 0xF) <= SPI_DS_8BITS) {
 			// 8-bit data
 			// pSPIx->DR = *pTxBuffer;
-			// load the data from DR to
-			*pRxBuffer = *((volatile uint8_t *)&pSPIx->DR);
+			// load the data from DR to buffer
+			*pRxBuffer = (uint8_t) pSPIx->DR;
 			length--; // decrement once because data is 8-bit wide
 			pRxBuffer++;
 		 } else {
 			// 16-bit data
-			 *((uint16_t*)pRxBuffer) = pSPIx->DR; //typecast to 16-bits
+			 *((uint16_t*)pRxBuffer) = (uint16_t)pSPIx->DR; //typecast to 16-bits
 			length -= 2; // decrement twice for 2x 8-bit data
-			(uint16_t*)pRxBuffer++; //typecast to 16-bits
+			pRxBuffer += 2; //typecast to 16-bits
 		 }
 	}
 }
