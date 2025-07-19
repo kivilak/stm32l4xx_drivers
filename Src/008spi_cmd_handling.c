@@ -1,7 +1,7 @@
 /*
- * 007spi_txonly_arduino.c
+ * 008spi_cmd_handling.c
  *
- *  Created on: Jul 18, 2025
+ *  Created on: Jul 19, 2025
  *      Author: Kivilak Chathuranga
  */
 
@@ -15,6 +15,25 @@
  * PB12 --> SPI2_NSS
  * ALT function mode : 5
  */
+
+//commands
+#define CMD_LED_CTRL		0x50
+#define CMD_SENSOR_READ		0x51
+#define CMD_LED_READ		0x52
+#define CMD_PRINT			0x53
+#define CMD_ID_READ			0x54
+
+#define LED_ON		1
+#define LED_OFF		0
+
+//Arduino analog pins
+#define ANALOG_PIN0		0
+#define ANALOG_PIN1		1
+#define ANALOG_PIN2		2
+#define ANALOG_PIN3		3
+
+//Arduino led pin
+#define LED_PIN			2
 
 void delay() {
 	for(uint32_t i = 0; i < 500000/2; i++);
@@ -80,9 +99,20 @@ void GPIO_ButtonInit(void) {
 	GPIO_Init(&GPIOButton);
 }
 
+uint8_t SPI_VerifyResponse(uint8_t ack_byte) {
+	if(ack_byte == 0xF5) {
+		return 1;
+	}
+
+	return 0;
+}
+
 int main(void)
 {
-	char user_data[] = "This bit is used in master mode only. it allows the SPI to generate an NSS pulse between two consecutive data when doing continuous transfers.";
+	uint8_t dummyWrtie = 0xff;
+	uint8_t dummyRead;
+	uint8_t ackByte;
+	uint8_t args[2];
 
 	//this function is used to initialize the GPIO pins to behave as SPI2 pins
 	SPI2_GPIOInit();
@@ -100,19 +130,35 @@ int main(void)
 	SPI_SSOEConfig(SPI2, ENABLE);
 
 	while(1) {
-		while(!GPIO_ReadFromInputPin(GPIOC, GPIO_PIN_NO_13));
+		while(GPIO_ReadFromInputPin(GPIOC, GPIO_PIN_NO_13));
 
 		delay();
 
 		//enable the SPI2 peripheral
 		SPI_PeripheralControl(SPI2,ENABLE);
 
-		//send length info
-		uint8_t dataLen = strlen(user_data);
-		SPI_SendData(SPI2, &dataLen, 1);
+		/* Led control command */
+		uint8_t cmdcode = CMD_LED_CTRL;
 
-		//to send data
-		SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data));
+		//send command
+		SPI_SendData(SPI2, &cmdcode, 1);
+
+		//read dummy data to clear off the RXNE
+		//SPI_ReceiveData(SPI2, &dummyRead, 1);
+
+		//send dummy bits(1byte) to fetch the response from the slave
+		SPI_SendData(SPI2, &dummyWrtie, 1);
+
+		//read the ack byte received
+		SPI_ReceiveData(SPI2, &ackByte, 1);
+
+		/*if(SPI_VerifyResponse(ackByte)) {
+			//send arguments
+			args[0] = LED_PIN;
+			args[1] = LED_ON;
+
+			SPI_SendData(SPI2, args, 2);
+		}*/
 
 		while(SPI_GetFlagStatus(SPI2, SPI_BSY_FLAG)); //checks the SPI is not busy
 		SPI_PeripheralControl(SPI2, DISABLE); //disable the SPI2 peripheral
@@ -121,5 +167,3 @@ int main(void)
 	return 0;
 
 }
-
-
